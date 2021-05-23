@@ -6,61 +6,54 @@ from random import *
 import time
 from pygame.locals import *
 
-BOARD_SIZE = WIDTH, HEIGHT = 1280,720    # WIDTH = size * qsize , HEIGHT = size *qsize
+BOARD_SIZE = WIDTH, HEIGHT = 600,600    # WIDTH = size * qsize , HEIGHT = size *qsize
 DEAD_COLOR = 0,0,0
 ALIVE_COLOR = 255,255,255
 
 class LifeGame:
     def __init__(self) -> None:
         self.g = Game()
-        self.qsize = 20
+        self.qsize = 5
         self.sizex,self.sizey = WIDTH//self.qsize,HEIGHT//self.qsize  
         self.g.initalize(self.sizey,self.sizex)
-        
         self.screen = pygame.display.set_mode(BOARD_SIZE)
         self.screen = pygame.display.set_mode(BOARD_SIZE)
+        self.fps = 1/30
         pygame.init()
     def figure(self):
-        self.g.overwrite_certain_pos(6,5,"A")
-        self.g.overwrite_certain_pos(6,6,"A")
-        self.g.overwrite_certain_pos(6,7,"A")
-        self.g.overwrite_certain_pos(7,6,"A")
+        self.g.overwrite_certain_pos(6,5,1)
+        self.g.overwrite_certain_pos(6,6,1)
+        self.g.overwrite_certain_pos(6,7,1)
+        self.g.overwrite_certain_pos(7,6,1)
     def randomboard(self):              #X/4 Y/4
-        l = ["A","D"]
+        l = [1,0]
         for i in range(self.sizey//4,self.sizey-self.sizey//4):
             for j in range(self.sizex//4,self.sizex-self.sizex//4):
-                if randint(0,5) == 0:
-                    self.g.overwrite_certain_pos(i,j,"A")
+                if randint(0,1) == 0:
+                    self.g.overwrite_certain_pos(i,j,1)
     def spaceship(self):
-        self.g.overwrite_certain_pos(1,3,"A")
-        self.g.overwrite_certain_pos(2,3,"A")
-        self.g.overwrite_certain_pos(3,3,"A")
-        self.g.overwrite_certain_pos(3,2,"A")
-        self.g.overwrite_certain_pos(2,1,"A")        
+        self.g.overwrite_certain_pos(1,3,1)
+        self.g.overwrite_certain_pos(2,3,1)
+        self.g.overwrite_certain_pos(3,3,1)
+        self.g.overwrite_certain_pos(3,2,1)
+        self.g.overwrite_certain_pos(2,1,1)        
     def start(self,iterations = float('inf')):
-        fps = 1/30
         current = self.g.board
         self.draw()
-        time.sleep(fps)
+        time.sleep(self.fps)
         n = 0
-        next = self.g.nextstate()
-        self.g.board = next 
+        self.g.nextstate()
         self.draw()
-        time.sleep(fps)
+        time.sleep(self.fps)
         while n < iterations:
-            if current == next:
-                break
-            else:
-                current = next
-                next = self.g.nextstate()
-                self.g.board = next
-                self.draw()
-                time.sleep(fps)
-                n+=1
-                for event in pygame.event.get():
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            pygame.quit()
+            self.g.nextstate()
+            self.draw()
+            time.sleep(self.fps)
+            n+=1
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
     def run(self):
         self.screen.fill(DEAD_COLOR)
         # self.spaceship()
