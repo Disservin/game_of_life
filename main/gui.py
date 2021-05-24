@@ -3,12 +3,13 @@ import sys
 import pygame
 import cProfile
 from random import *
-import time
 from pygame.locals import *
 
-BOARD_SIZE = WIDTH, HEIGHT = 600,600    # WIDTH = size * qsize , HEIGHT = size *qsize
+BOARD_SIZE = WIDTH, HEIGHT = 600,600   # WIDTH = size * qsize , HEIGHT = size *qsize  1280,720          600,600
 DEAD_COLOR = 0,0,0
 ALIVE_COLOR = 255,255,255
+FPS = 24
+fpsclock = pygame.time.Clock()
 
 class LifeGame:
     def __init__(self) -> None:
@@ -18,18 +19,16 @@ class LifeGame:
         self.g.initalize(self.sizey,self.sizex)
         self.screen = pygame.display.set_mode(BOARD_SIZE)
         self.screen = pygame.display.set_mode(BOARD_SIZE)
-        self.fps = 1/30
         pygame.init()
     def figure(self):
         self.g.overwrite_certain_pos(6,5,1)
         self.g.overwrite_certain_pos(6,6,1)
         self.g.overwrite_certain_pos(6,7,1)
         self.g.overwrite_certain_pos(7,6,1)
-    def randomboard(self):              #X/4 Y/4
-        l = [1,0]
+    def randomboard(self):              
         for i in range(self.sizey//4,self.sizey-self.sizey//4):
             for j in range(self.sizex//4,self.sizex-self.sizex//4):
-                if randint(0,1) == 0:
+                if randint(0,1) == 1:
                     self.g.overwrite_certain_pos(i,j,1)
     def spaceship(self):
         self.g.overwrite_certain_pos(1,3,1)
@@ -40,25 +39,25 @@ class LifeGame:
     def start(self,iterations = float('inf')):
         current = self.g.board
         self.draw()
-        time.sleep(self.fps)
         n = 0
         self.g.nextstate()
         self.draw()
-        time.sleep(self.fps)
         while n < iterations:
             self.g.nextstate()
             self.draw()
-            time.sleep(self.fps)
             n+=1
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
+                    elif event.key == pygame.key.key_code("p"):
+                        return
+
     def run(self):
         self.screen.fill(DEAD_COLOR)
         # self.spaceship()
         self.randomboard()
-        self.start()
+        self.draw()
         running = True
         while running:
             for event in pygame.event.get():
@@ -67,8 +66,13 @@ class LifeGame:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
+                    elif event.key == pygame.key.key_code("p"):
+                        self.start()
+                    elif event.key == pygame.key.key_code("n"):
+                        self.g.nextstate()
+                        self.draw()
                 pygame.display.update()
-                pygame.event.pump()
+                # pygame.event.pump()
         pygame.quit()
         sys.exit()
     def draw(self):
@@ -79,6 +83,7 @@ class LifeGame:
             i,j = element
             pygame.draw.rect(self.screen,DEAD_COLOR,(j*self.qsize,i*self.qsize,1*self.qsize,1*self.qsize))
         pygame.display.update()
+        fpsclock.tick(FPS)
 
 if __name__ == "__main__":
     g = Game()

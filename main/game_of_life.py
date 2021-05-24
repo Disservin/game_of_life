@@ -1,7 +1,9 @@
 import sys
 import os
+from numpy.core.numeric import convolve
 from scipy import signal
-from numpy import ones,int8
+from scipy.signal.signaltools import convolve
+from numpy import ones,int8,array
 import cProfile
 
 class Game(object):
@@ -11,8 +13,7 @@ class Game(object):
         self.board_sizey= 0
         self.alive_list = []
         self.dead_list = []
-        self.kernel = ones((3,3),dtype=int8)
-        self.kernel[1,1] = 0
+        self.kernel = array([[1, 1, 1],[1, 0, 1],[1, 1, 1]], dtype=int8)        #ones((3,3),dtype=int8) self.kernel[1,1] = 0
 
     def initalize(self,n,m): # n * m # Row, Column   
         self.board = []
@@ -64,23 +65,24 @@ class Game(object):
 
     def continuous(self,iterations = float('inf')):
         current = self.board
-        print(g)
+        # print(g)
         n = 0
         g.nextstate()
-        print(g)
+        # print(g)
         while n < iterations:
             g.nextstate()
-            print(g)
+            # print(g)
             n+=1
 
 if __name__ == "__main__":
     g = Game()
     def run():
-        g.initalize(120,120)
+        g.initalize(400,400)
         g.overwrite_certain_pos(6,5,1)
         g.overwrite_certain_pos(6,6,1)
         g.overwrite_certain_pos(6,7,1)
+        g.overwrite_certain_pos(7,7,1)
         g.overwrite_certain_pos(7,6,1)
-        g.continuous(20)
-    run()
-    # cProfile.run('run()',sort="tottime")
+        g.continuous(40)
+    # run()
+    cProfile.run('run()',sort="tottime")
