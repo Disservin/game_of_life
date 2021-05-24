@@ -1,5 +1,4 @@
 from game_of_life import *
-import sys
 import pygame
 import cProfile
 from random import *
