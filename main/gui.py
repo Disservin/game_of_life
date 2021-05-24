@@ -12,13 +12,14 @@ FPS = 24
 fpsclock = pygame.time.Clock()
 
 class LifeGame:
-    def __init__(self) -> None:
+    def __init__(self,grid = True) -> None:
         self.g = Game()
         self.qsize = 20
         self.sizex,self.sizey = WIDTH//self.qsize,HEIGHT//self.qsize  
         self.g.initalize(self.sizey,self.sizex)
         self.screen = pygame.display.set_mode(BOARD_SIZE)
         self.screen = pygame.display.set_mode(BOARD_SIZE)
+        self.grid = grid
         pygame.init()
     def restart(self):
         return self.g.initalize(self.sizey,self.sizex)
@@ -30,16 +31,16 @@ class LifeGame:
     def start(self,empty_hash,iterations = float('inf')):
         current = self.g.board
         current_hash = hash(str(self.g.board))
-        self.draw2()
+        self.drawing()
         n = 0
         self.g.nextstate()
         new_hash = hash(str(self.g.board))
-        self.draw2()
+        self.drawing()
         while n < iterations:
             current_hash = new_hash
             self.g.nextstate()
             new_hash = hash(str(self.g.board))
-            self.draw2()
+            self.drawing()
             n+=1
             if empty_hash == new_hash:
                 return
@@ -56,12 +57,20 @@ class LifeGame:
         str_list = str(self.g.board)
         hash_list = hash(str_list)
         return hash_list
+    def drawing(self):
+        if self.grid == True:
+            self.draw2()
+        else:
+            self.draw2()
     def run(self):
         self.screen.fill(DEAD_COLOR)
-        # self.randomboard()
         my_hash = self.emptyhash()
-        self.draw_grid()
-        self.draw2()
+        self.randomboard()
+        if self.grid == True:
+            self.draw_grid()
+            self.draw2()
+        else:
+            self.draw2()
         running = True
         while running:
             for event in pygame.event.get():
@@ -74,13 +83,22 @@ class LifeGame:
                         self.start(my_hash)
                     elif event.key == pygame.key.key_code("n"):
                         self.g.nextstate()
-                        self.draw2()
+                        self.drawing()
                     elif event.key == pygame.key.key_code("r"):
                         self.restart()
                         self.g.alive_list = []
                         self.g.dead_list = []
                         self.draw_black()
                         print("reset")
+                    elif event.key == pygame.key.key_code("z"):
+                        self.restart()
+                        self.g.alive_list = []
+                        self.g.dead_list = []
+                        self.draw_black()
+                        print("reset")
+                        self.randomboard()
+                        self.drawing()
+                        self.start(my_hash)
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     location = pygame.mouse.get_pos()
                     col = location[0]//self.qsize
@@ -97,7 +115,7 @@ class LifeGame:
                         if [row,col] in self.g.dead_list:
                             self.g.dead_list.remove([row,col])
                         added = True
-                    self.draw2()
+                    self.drawing()
                 pygame.display.update()
                 # pygame.event.pump()
         pygame.quit()
@@ -130,10 +148,11 @@ class LifeGame:
         fpsclock.tick(FPS)
     def draw_black(self):
         self.screen.fill(DEAD_COLOR)
-        self.draw_grid()
+        if self.grid:
+            self.draw_grid()
 if __name__ == "__main__":
     g = Game()
-    gui = LifeGame()
+    gui = LifeGame(False)
     gui.run()
     # cProfile.run('gui.run()')
 
