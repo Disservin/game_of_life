@@ -1,8 +1,5 @@
 import sys
-import os
-from numpy.core.numeric import convolve
 from scipy import signal
-from scipy.signal.signaltools import convolve
 from numpy import ones,int8,array
 import cProfile
 
