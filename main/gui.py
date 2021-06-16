@@ -13,7 +13,7 @@ fpsclock = pygame.time.Clock()
 class LifeGame:
     def __init__(self,grid = True) -> None:
         self.g = Game()
-        self.qsize = 20
+        self.qsize = 5
         self.sizex,self.sizey = WIDTH//self.qsize,HEIGHT//self.qsize  
         self.g.initalize(self.sizey,self.sizex)
         self.screen = pygame.display.set_mode(BOARD_SIZE)
@@ -57,19 +57,16 @@ class LifeGame:
         hash_list = hash(str_list)
         return hash_list
     def drawing(self):
-        if self.grid == True:
-            self.draw2()
-        else:
-            self.draw2()
+        self.draw_opti()
+        # self.draw2()
     def run(self):
         self.screen.fill(DEAD_COLOR)
         my_hash = self.emptyhash()
         self.randomboard()
         if self.grid == True:
             self.draw_grid()
-            self.draw2()
-        else:
-            self.draw2()
+        self.draw2()
+
         running = True
         while running:
             for event in pygame.event.get():
@@ -87,17 +84,20 @@ class LifeGame:
                         self.restart()
                         self.g.alive_list = []
                         self.g.dead_list = []
+                        self.g.changed_cells = []
                         self.draw_black()
                         print("reset")
                     elif event.key == pygame.key.key_code("z"):
                         self.restart()
                         self.g.alive_list = []
                         self.g.dead_list = []
+                        self.g.changed_cells = []
                         self.draw_black()
                         print("reset")
                         self.randomboard()
-                        self.drawing()
-                        self.start(my_hash)
+                        self.g.add_alive_dead()
+                        self.draw2()
+                        # self.start(my_hash)
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     location = pygame.mouse.get_pos()
                     col = location[0]//self.qsize
@@ -114,26 +114,35 @@ class LifeGame:
                         if [row,col] in self.g.dead_list:
                             self.g.dead_list.remove([row,col])
                         added = True
-                    self.drawing()
+                    self.draw2()
                 pygame.display.update()
                 # pygame.event.pump()
         pygame.quit()
         sys.exit()
-    def draw(self):             # BLACK BACKGROUND
-        for element in self.g.alive_list:
-            i,j = element
-            pygame.draw.rect(self.screen,ALIVE_COLOR,(j*self.qsize,i*self.qsize,1*self.qsize,1*self.qsize))
-        for element in self.g.dead_list:
-            i,j = element
-            pygame.draw.rect(self.screen,DEAD_COLOR,(j*self.qsize,i*self.qsize,1*self.qsize,1*self.qsize))
-        pygame.display.update()
-        fpsclock.tick(FPS)
+    # def draw(self):             # BLACK BACKGROUND
+    #     for element in self.g.alive_list:
+    #         i,j = element
+    #         pygame.draw.rect(self.screen,ALIVE_COLOR,(j*self.qsize,i*self.qsize,1*self.qsize,1*self.qsize))
+    #     for element in self.g.dead_list:
+    #         i,j = element
+    #         pygame.draw.rect(self.screen,DEAD_COLOR,(j*self.qsize,i*self.qsize,1*self.qsize,1*self.qsize))
+    #     pygame.display.update()
+    #     fpsclock.tick(FPS)
     def draw_grid(self):
         x,y= 0,0
         w = 1
         for row in range(0,WIDTH,self.qsize):
             for col in range(0,HEIGHT,self.qsize):
                 pygame.draw.rect(self.screen,(128,128,128),(row,col,self.qsize,self.qsize),1)
+        pygame.display.update()
+        fpsclock.tick(FPS)
+    def draw_opti(self):
+        for element in self.g.changed_cells:
+            i,j,s= element
+            if s == 1:
+                pygame.draw.rect(self.screen,ALIVE_COLOR,(j*self.qsize+1,i*self.qsize+1,self.qsize-2,self.qsize-2))
+            else:
+                pygame.draw.rect(self.screen,DEAD_COLOR,(j*self.qsize+1,i*self.qsize+1,self.qsize-2,self.qsize-2))
         pygame.display.update()
         fpsclock.tick(FPS)
     def draw2(self):

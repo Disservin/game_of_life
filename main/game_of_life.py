@@ -11,6 +11,8 @@ class Game(object):
         self.alive_list = []
         self.dead_list = []
         self.kernel = array([[1, 1, 1],[1, 0, 1],[1, 1, 1]], dtype=int8)        #ones((3,3),dtype=int8) self.kernel[1,1] = 0
+        self.changed_cells = []
+        self.generation = None
 
     def initalize(self,n,m): # n * m # Row, Column   
         self.board = []
@@ -20,12 +22,14 @@ class Game(object):
                 self.board[i].append(0)
         self.board_size = n
         self.board_sizey = m
+        self.generation = 0
 
     def add_alive_dead(self):               # DEAD = 0 , ALIVE = 1
         for i in range(self.board_size):
             for j in range(self.board_sizey):
-                if self.board[i][j] == 1:
-                    self.alive_list.append([i,j])
+                if self.board[i][j] == 0:
+                    self.dead_list.append([i,j])
+        self.generation = 1
                 
     def __str__(self):
         for i in range(len(self.board)):
@@ -55,6 +59,7 @@ class Game(object):
         for element in change:
             i,j,action = element
             self.board[i][j] = action
+        self.changed_cells = change
         return self.board
     def overwrite_certain_pos(self,i,j,input):
         self.board[i][j] = input
@@ -82,4 +87,4 @@ if __name__ == "__main__":
         g.overwrite_certain_pos(7,6,1)
         g.continuous(40)
     # run()
-    cProfile.run('run()',sort="tottime")
+    # cProfile.run('run()',sort="tottime")
