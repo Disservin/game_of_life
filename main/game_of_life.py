@@ -60,6 +60,7 @@ class Game(object):
             i,j,action = element
             self.board[i][j] = action
         self.changed_cells = change
+        self.generation += 1
         return self.board
     def overwrite_certain_pos(self,i,j,input):
         self.board[i][j] = input

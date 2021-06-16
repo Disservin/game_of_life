@@ -5,6 +5,7 @@ from random import *
 from pygame.locals import *
 
 BOARD_SIZE = WIDTH, HEIGHT = 1280,720  # WIDTH = size * qsize , HEIGHT = size *qsize  1280,720          600,600
+FPS_GEN = 100
 DEAD_COLOR = 0,0,0
 ALIVE_COLOR = 255,255,255
 FPS = 24
@@ -14,12 +15,16 @@ class LifeGame:
     def __init__(self,grid = True) -> None:
         self.g = Game()
         self.qsize = 5
+        pygame.font.init()
         self.sizex,self.sizey = WIDTH//self.qsize,HEIGHT//self.qsize  
         self.g.initalize(self.sizey,self.sizex)
-        self.screen = pygame.display.set_mode(BOARD_SIZE)
-        self.screen = pygame.display.set_mode(BOARD_SIZE)
+        board= WIDTH+FPS_GEN,HEIGHT
+        self.screen = pygame.display.set_mode(board)
+        self.screen = pygame.display.set_mode(board)
         self.grid = grid
+        self.font = pygame.font.SysFont("timesnewroman", 20)
         pygame.init()
+       
     def restart(self):
         return self.g.initalize(self.sizey,self.sizex)
     def randomboard(self):              
@@ -30,11 +35,12 @@ class LifeGame:
     def start(self,empty_hash,iterations = float('inf')):
         current = self.g.board
         current_hash = hash(str(self.g.board))
-        self.drawing()
+        self.draw2()
+        # self.drawing()
         n = 0
         self.g.nextstate()
         new_hash = hash(str(self.g.board))
-        self.drawing()
+        self.draw2()
         while n < iterations:
             current_hash = new_hash
             self.g.nextstate()
@@ -51,6 +57,8 @@ class LifeGame:
                         pygame.quit()
                     elif event.key == pygame.key.key_code("p"):
                         return 
+        fpsclock.tick(FPS)
+            # print(fpsclock.get_fps(),end='\r')
     def emptyhash(self):
         self.restart()
         str_list = str(self.g.board)
@@ -59,6 +67,7 @@ class LifeGame:
     def drawing(self):
         self.draw_opti()
         # self.draw2()
+        fpsclock.tick(FPS)
     def run(self):
         self.screen.fill(DEAD_COLOR)
         my_hash = self.emptyhash()
@@ -66,6 +75,7 @@ class LifeGame:
         if self.grid == True:
             self.draw_grid()
         self.draw2()
+        self.draw_opti()
 
         running = True
         while running:
@@ -97,6 +107,7 @@ class LifeGame:
                         self.randomboard()
                         self.g.add_alive_dead()
                         self.draw2()
+                        self.draw_opti()
                         # self.start(my_hash)
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     location = pygame.mouse.get_pos()
@@ -117,6 +128,11 @@ class LifeGame:
                     self.draw2()
                 pygame.display.update()
                 # pygame.event.pump()
+            # fps = self.font.render(str(int(fpsclock.get_fps())), True, pygame.Color('white'))
+            # self.screen.blit(fps, (50, 50))
+            # pygame.display.flip()
+            # print(fpsclock.get_fps(),end='\r')
+            fpsclock.tick(FPS)
         pygame.quit()
         sys.exit()
     # def draw(self):             # BLACK BACKGROUND
@@ -137,6 +153,13 @@ class LifeGame:
         pygame.display.update()
         fpsclock.tick(FPS)
     def draw_opti(self):
+        fps = self.font.render("FPS {0}".format(str(int(fpsclock.get_fps()))), True, pygame.Color('white'))
+        gen = self.font.render("Gen: {0}".format(str(self.g.generation)), True, pygame.Color('white'))
+        self.screen.fill(pygame.Color("black"),(1281,0,100,50)) 
+        font_surface = self.font.render("edited", True, pygame.Color("white"))
+        self.screen.blit(fps, (1281, 0))
+        self.screen.blit(gen,(1281, 20))
+
         for element in self.g.changed_cells:
             i,j,s= element
             if s == 1:
@@ -158,6 +181,7 @@ class LifeGame:
         self.screen.fill(DEAD_COLOR)
         if self.grid:
             self.draw_grid()
+        fpsclock.tick(FPS)
 if __name__ == "__main__":
     g = Game()
     gui = LifeGame(False)
